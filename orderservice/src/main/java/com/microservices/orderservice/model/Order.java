@@ -23,11 +23,9 @@ public class Order {
     @NotBlank(message = "Name is required")
     private String customerName;
 
-    @ManyToMany
-    @JoinTable(name = "order_products",
-               joinColumns = @JoinColumn(name = "order_id"),
-               inverseJoinColumns = @JoinColumn(name = "product_id"))
-    private List<Product> products;
+    @ElementCollection
+    @CollectionTable(name = "order_products", joinColumns = @JoinColumn(name = "order_id"))
+    private List<ProductDTO> products;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email address")

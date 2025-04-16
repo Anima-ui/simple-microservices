@@ -89,6 +89,7 @@ services:
       - pgadmin-data:/var/lib/pgadmin/
     depends_on:
       - postgres
+      - postgres_storehouse
     networks:
       - backend
 
@@ -148,11 +149,43 @@ services:
       - kafka
       - order-service
 
+  postgres_storehouse: 
+    image: postgres
+    container_name: postgres_storehouse
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USERNAME_STOREHOUSE}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_STOREHOUSE}
+    volumes:
+      - pgdata-storehouse:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  storehouse:
+    image: storehouse
+    container_name: storehouse
+    build:
+      context: ./storehouse
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_storehouse:5432/${POSTGRES_USERNAME_STOREHOUSE}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USERNAME_STOREHOUSE}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD_STOREHOUSE}
+    networks:
+      - backend
+    depends_on:
+      - postgres_storehouse
+
+
 
 volumes:
   pgdata: {}
   pgadmin-data: {}
   mongo: {}
+  pgdata-storehouse: {}
 
 networks:
   backend:
