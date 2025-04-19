@@ -13,12 +13,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderDTO {
-    private Long orderId;
+public class RequestOrderDTO {
 
     private String customerName;
 
-    private List<ProductDTO> products;
+    private List<RequestProductDTO> requestProducts;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email address")

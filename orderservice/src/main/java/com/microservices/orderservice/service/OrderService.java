@@ -1,9 +1,12 @@
 package com.microservices.orderservice.service;
 
+import com.microservices.orderservice.client.StorehouseClient;
 import com.microservices.orderservice.exceptionHandling.OrderNotFoundException;
 import com.microservices.orderservice.mapper.Mapper;
 import com.microservices.orderservice.model.Order;
-import com.microservices.orderservice.model.OrderDTO;
+import com.microservices.orderservice.model.RequestOrderDTO;
+import com.microservices.orderservice.model.ResponseOrderDTO;
+import com.microservices.orderservice.model.ResponseProductDTO;
 import com.microservices.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +15,7 @@ import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,13 +26,19 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final Mapper mapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final StorehouseClient storehouseClient;
 
-    public void saveOrderDTO(OrderDTO order) {
+    public ResponseOrderDTO saveRequestOrderDTO(RequestOrderDTO order) {
+        ResponseOrderDTO responseOrderDTO = new ResponseOrderDTO();
+
         try {
-            Order savedOrder = orderRepository.save(mapper.toOrder(order));
-            order.setOrderId(savedOrder.getOrderId());
+            List<ResponseProductDTO> responseProductDTOS = storehouseClient.checkProduct(order.getRequestProducts());
+            Order savedOrder = orderRepository.save(mapper.requestToOrder(order, responseProductDTOS));
+            responseOrderDTO = mapper.orderToResponse(savedOrder);
         }catch (DataAccessException e) {
             log.error("Failed to save order to database: {}", e.getMessage());
+        }catch (RuntimeException e) {
+            log.error("Something went wrong: {}", e.getMessage());
             throw e;
         }
 
@@ -38,12 +48,13 @@ public class OrderService {
             log.error("Failed to send message to Kafka for order with email {}: {}", order.getCustomerEmail(), e.getMessage());
             throw new KafkaException("Failed to send message to Kafka " + e.getMessage());
         }
+        return responseOrderDTO;
     }
 
-    public OrderDTO getOrderByEmail(String customerEmail) {
+    public ResponseOrderDTO getOrderByEmail(String customerEmail) {
         Optional<Order> order = orderRepository.getOrderByCustomerEmail(customerEmail);
         if (order.isPresent()){
-            return mapper.toOrderDto(order.get());
+            return mapper.orderToResponse(order.get());
         }
         throw new OrderNotFoundException("Order not found for email: " + customerEmail);
     }

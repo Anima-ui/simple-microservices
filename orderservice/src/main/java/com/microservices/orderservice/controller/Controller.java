@@ -1,8 +1,9 @@
 package com.microservices.orderservice.controller;
 
 import com.microservices.orderservice.client.UserClient;
-import com.microservices.orderservice.exceptionHandling.OrderNotFoundException;
-import com.microservices.orderservice.model.OrderDTO;
+import com.microservices.orderservice.exceptionHandling.UserNotFoundException;
+import com.microservices.orderservice.model.RequestOrderDTO;
+import com.microservices.orderservice.model.ResponseOrderDTO;
 import com.microservices.orderservice.service.OrderService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -23,23 +24,24 @@ public class Controller {
     private final UserClient userClient;
 
     @PostMapping
-    public ResponseEntity<OrderDTO> createOrder(@RequestBody @Valid OrderDTO order) {
+    public ResponseEntity<ResponseOrderDTO> createOrder(@RequestBody @Valid RequestOrderDTO order) {
         if (userClient.userExistsByEmail(order.getCustomerEmail())) {
-            orderService.saveOrderDTO(order);
-            return new ResponseEntity<>(order, HttpStatus.CREATED);
+            ResponseOrderDTO responseOrderDTO = orderService.saveRequestOrderDTO(order);
+            return new ResponseEntity<>(responseOrderDTO, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(order, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping
-    public ResponseEntity<OrderDTO> getOrder(@RequestParam @Email(message = "Invalid Email")
+    public ResponseEntity<ResponseOrderDTO> getOrder(@RequestParam
+                                                 @Email(message = "Invalid Email")
                                                  @NotBlank(message = "Email is required")
                                                  String customerEmail) {
         if (userClient.userExistsByEmail(customerEmail)) {
-            OrderDTO orderDTO = orderService.getOrderByEmail(customerEmail);
+            ResponseOrderDTO orderDTO = orderService.getOrderByEmail(customerEmail);
             return new ResponseEntity<>(orderDTO, HttpStatus.OK);
         } else {
-            throw new OrderNotFoundException("Order not found for email: " + customerEmail);
+            throw new UserNotFoundException("User not found for email: " + customerEmail);
         }
     }
 }

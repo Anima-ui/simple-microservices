@@ -25,7 +25,7 @@ public class Order {
 
     @ElementCollection
     @CollectionTable(name = "order_products", joinColumns = @JoinColumn(name = "order_id"))
-    private List<ProductDTO> products;
+    private List<ResponseProductDTO> products;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email address")

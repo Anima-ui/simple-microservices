@@ -1,28 +1,43 @@
 package com.microservices.orderservice.mapper;
 
-import com.microservices.orderservice.model.Order;
-import com.microservices.orderservice.model.OrderDTO;
-import com.microservices.orderservice.model.ProductDTO;
+import com.microservices.orderservice.model.*;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Component
 public class Mapper {
 
-    public OrderDTO toOrderDto(Order order) {
-        return OrderDTO.builder()
-                .orderId(order.getOrderId())
-                .customerEmail(order.getCustomerEmail())
-                .customerName(order.getCustomerName())
-                .products(order.getProducts().stream().map(ProductDTO::fromEntity).toList())
+    public ResponseOrderDTO orderToResponse(Order order){
+        ResponseOrderDTO responseOrderDTO = new ResponseOrderDTO();
+        responseOrderDTO.setCustomerName(order.getCustomerName());
+
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        if (order.getProducts() != null) {
+            for (ResponseProductDTO productDTO : order.getProducts()) {
+                totalPrice = totalPrice.add(productDTO.getPrice());
+            }
+        }
+        responseOrderDTO.setTotalPrice(totalPrice);
+
+        List<ResponseProductDTO> products = order.getProducts() != null
+                ? List.copyOf(order.getProducts())
+                : List.of();
+        responseOrderDTO.setProducts(products);
+
+        return responseOrderDTO;
+    }
+
+    public Order requestToOrder(RequestOrderDTO orderDTO, List<ResponseProductDTO> responseProductDTOS) {
+        return Order.builder()
+                .customerName(orderDTO.getCustomerName())
+                .customerEmail(orderDTO.getCustomerEmail())
+                .products(responseProductDTOS.stream().map(Mapper::copyOfResponseProduct).toList())
                 .build();
     }
 
-    public Order toOrder(OrderDTO dto) {
-        return Order.builder()
-                .orderId(dto.getOrderId())
-                .customerEmail(dto.getCustomerEmail())
-                .customerName(dto.getCustomerName())
-                .products(dto.getProducts().stream().map(ProductDTO::toEntity).toList())
-                .build();
+    public static ResponseProductDTO copyOfResponseProduct(ResponseProductDTO dto){
+        return new ResponseProductDTO(dto.getName(), dto.getPrice());
     }
 }
