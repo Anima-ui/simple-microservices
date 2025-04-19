@@ -43,8 +43,6 @@ public class OrderService {
         }
 
         try {
-            System.out.println(order.getCustomerEmail());
-            System.out.println(order.getCustomerEmail().getClass());
             kafkaTemplate.send("order-service", order.getCustomerEmail());
         }catch (KafkaException e) {
             log.error("Failed to send message to Kafka for order with email {}: {}", order.getCustomerEmail(), e.getMessage());

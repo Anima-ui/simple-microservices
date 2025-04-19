@@ -10,10 +10,9 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Orders",
-        uniqueConstraints = @UniqueConstraint(columnNames = "customerEmail"))
 @Builder
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
+@Table(name = "orders")
 public class Order {
 
     @Id
