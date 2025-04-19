@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.listener.ListenerExecutionFailedException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -27,12 +28,15 @@ public class EmailService {
 
     @KafkaListener(topics = "order-service", groupId = "notification-group")
     public void listen(String customerEmail) {
+        log.info("Received message and type: {} {}", customerEmail, customerEmail.getClass());
         try {
             sendEmail(customerEmail);
             log.info("Email sent");
-        }catch (MessagingException | UnsupportedEncodingException e) {
+        }catch (MessagingException | UnsupportedEncodingException | ListenerExecutionFailedException e) {
             log.error("Failed to send email to {}: {}", customerEmail, e.getMessage());
             throw new RuntimeException(e);
+        }catch (RuntimeException e) {
+            log.error("Something went wrong: {}", e.getMessage());
         }
     }
 

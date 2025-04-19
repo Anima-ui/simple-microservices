@@ -39,6 +39,7 @@ public class ProductService {
                 ResponseProductDTO responseProductDTO = new ResponseProductDTO();
                 responseProductDTO.setName(product.get().getName());
                 responseProductDTO.setPrice(product.get().getPrice());
+                responseProductDTO.setQuantity(requestProductDTO.getQuantity());
 
                 responseProductDTOs.add(responseProductDTO);
             } else {

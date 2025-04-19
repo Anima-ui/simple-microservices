@@ -16,7 +16,7 @@ public class Mapper {
         BigDecimal totalPrice = BigDecimal.ZERO;
         if (order.getProducts() != null) {
             for (ResponseProductDTO productDTO : order.getProducts()) {
-                totalPrice = totalPrice.add(productDTO.getPrice());
+                totalPrice = totalPrice.add(productDTO.getPrice().multiply(BigDecimal.valueOf(productDTO.getQuantity())));
             }
         }
         responseOrderDTO.setTotalPrice(totalPrice);
@@ -38,6 +38,6 @@ public class Mapper {
     }
 
     public static ResponseProductDTO copyOfResponseProduct(ResponseProductDTO dto){
-        return new ResponseProductDTO(dto.getName(), dto.getPrice());
+        return new ResponseProductDTO(dto.getName(), dto.getPrice(), dto.getQuantity());
     }
 }

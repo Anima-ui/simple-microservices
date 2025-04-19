@@ -25,4 +25,5 @@ public class ResponseProductDTO {
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than zero")
     private BigDecimal price;
 
+    private int quantity;
 }
