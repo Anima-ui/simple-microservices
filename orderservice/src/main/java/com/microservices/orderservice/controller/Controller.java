@@ -29,7 +29,7 @@ public class Controller {
             ResponseOrderDTO responseOrderDTO = orderService.saveRequestOrderDTO(order);
             return new ResponseEntity<>(responseOrderDTO, HttpStatus.CREATED);
         }
-        throw new UserNotFoundException("User not found with email: " + order.getCustomerEmail());
+        throw new UserNotFoundException("User not found for email: " + order.getCustomerEmail());
     }
 
     @GetMapping
