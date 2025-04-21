@@ -28,7 +28,6 @@ public class EmailService {
 
     @KafkaListener(topics = "order-service", groupId = "notification-group")
     public void listen(String customerEmail) {
-        log.info("Received message and type: {} {}", customerEmail, customerEmail.getClass());
         try {
             sendEmail(customerEmail);
             log.info("Email sent");
