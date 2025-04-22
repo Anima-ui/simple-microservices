@@ -9,8 +9,16 @@ spring:
             uri: http://user-service:8080
             predicates:
               - Path=/users/**
+              - Method=GET,POST
             filters:
               -PrefixPath=/api/v1
 
+          - id: order_service
+            uri: http://order-service:8082
+            predicates:
+              - Path=/order/**
+            filters:
+              - PrefixPath=/api/v1
+              - 
 server:
   port: 9000

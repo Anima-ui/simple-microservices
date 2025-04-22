@@ -181,6 +181,23 @@ services:
     depends_on:
       - postgres_storehouse
 
+  apiGateway:
+    image: apigateway
+    container_name: apigateway
+    build: 
+      context: ./API-Gateway
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    networks:
+      - backend
+    depends_on:
+      - user-service
+      - order-service
+    environment:
+      SERVER_PORT: 9000
+
+      
 
 
 volumes:
