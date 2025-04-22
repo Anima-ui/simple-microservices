@@ -11,7 +11,7 @@ spring:
               - Path=/users/**
               - Method=GET,POST
             filters:
-              -PrefixPath=/api/v1
+              - PrefixPath=/api/v1
 
           - id: order_service
             uri: http://order-service:8082
@@ -19,6 +19,5 @@ spring:
               - Path=/order/**
             filters:
               - PrefixPath=/api/v1
-              - 
 server:
   port: 9000
