@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderRepository extends CrudRepository<Order, Long> {
-    Optional<Order> getOrderByCustomerEmail(@NotBlank(message = "Email is required")
+    List<Order> getOrderByCustomerEmail(@NotBlank(message = "Email is required")
                                   @Email(message = "Invalid email address")
                                   String customerEmail);
 }

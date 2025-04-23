@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(path = "/api/v1/order")
 @RequiredArgsConstructor
@@ -33,12 +35,12 @@ public class Controller {
     }
 
     @GetMapping
-    public ResponseEntity<ResponseOrderDTO> getOrder(@RequestParam
+    public ResponseEntity<List<ResponseOrderDTO>> getOrder(@RequestParam
                                                  @Email(message = "Invalid Email")
                                                  @NotBlank(message = "Email is required")
                                                  String customerEmail) {
         if (userClient.userExistsByEmail(customerEmail)) {
-            ResponseOrderDTO orderDTO = orderService.getOrderByEmail(customerEmail);
+            List<ResponseOrderDTO> orderDTO = orderService.getOrderByEmail(customerEmail);
             return new ResponseEntity<>(orderDTO, HttpStatus.OK);
         } else {
             throw new UserNotFoundException("User not found for email: " + customerEmail);

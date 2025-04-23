@@ -8,16 +8,17 @@ spring:
           - id: user-service
             uri: http://user-service:8080
             predicates:
-              - Path=/users/**
+              - Path=/api/v1/users/**
               - Method=GET,POST
-            filters:
-              - PrefixPath=api/v1
 
           - id: order_service
             uri: http://order-service:8082
             predicates:
-              - Path=/order/**
-            filters:
-              - PrefixPath=api/v1
+              - Path=/api/v1/order/**
 server:
   port: 9000
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+

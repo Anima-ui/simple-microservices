@@ -15,6 +15,7 @@ import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,10 +53,14 @@ public class OrderService {
     }
 
 
-    public ResponseOrderDTO getOrderByEmail(String customerEmail) {
-        Optional<Order> order = orderRepository.getOrderByCustomerEmail(customerEmail);
-        if (order.isPresent()){
-            return mapper.orderToResponse(order.get());
+    public List<ResponseOrderDTO> getOrderByEmail(String customerEmail) {
+        List<Order> order = orderRepository.getOrderByCustomerEmail(customerEmail);
+        if (!order.isEmpty()) {
+            List<ResponseOrderDTO> responseOrderDTOS = new ArrayList<>();
+            for (Order orderItem : order) {
+                responseOrderDTOS.add(mapper.orderToResponse(orderItem));
+            }
+            return responseOrderDTOS;
         }
         throw new OrderNotFoundException("Order not found for email: " + customerEmail);
     }
